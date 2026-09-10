@@ -32,6 +32,7 @@ type Product = {
 }
 
 type CartItem = Product & { pack: Pack; quantity: number }
+type OrderDetails = { name: string; deliveryArea: string; deliveryTime: string; notes: string }
 
 type ModelContext = {
   registerTool: (tool: {
@@ -63,15 +64,16 @@ const products: Product[] = [
 
 const categories = ['All', 'Fresh picks', 'Exotic fruit', 'Dry fruits', 'Dates & nuts'] as const
 const currency = (amount: number) => `₹${amount.toLocaleString('en-IN')}`
-const ownerWhatsapp = import.meta.env.VITE_WHATSAPP_NUMBER?.replace(/\D/g, '')
+const ownerWhatsapp = (import.meta.env.VITE_WHATSAPP_NUMBER || '918277274039').replace(/\D/g, '')
+const emptyOrderDetails: OrderDetails = { name: '', deliveryArea: '', deliveryTime: '', notes: '' }
 
-const getOrderMessage = (items: CartItem[], total: number) => {
+const getOrderMessage = (items: CartItem[], total: number, orderDetails: OrderDetails = emptyOrderDetails) => {
   const details = items.map((item) => `• ${item.name} — ${item.pack.label} × ${item.quantity}: ${currency(item.pack.price * item.quantity)}`).join('\n')
-  return `Hello Atayinlife, I would like to place an order:\n\n${details}\n\nTotal: ${currency(total)}\n\nName:\nDelivery area:\nPreferred delivery time:`
+  return `Hello Atayinlife, I would like to place an order:\n\n${details}\n\nOrder total: ${currency(total)}\n\nCustomer details\nName: ${orderDetails.name || 'To be confirmed'}\nDelivery area: ${orderDetails.deliveryArea || 'To be confirmed'}\nPreferred delivery time: ${orderDetails.deliveryTime || 'To be confirmed'}${orderDetails.notes ? `\nNotes: ${orderDetails.notes}` : ''}`
 }
 
-const getWhatsAppUrl = (items: CartItem[], total: number) => {
-  const message = getOrderMessage(items, total)
+const getWhatsAppUrl = (items: CartItem[], total: number, orderDetails?: OrderDetails) => {
+  const message = getOrderMessage(items, total, orderDetails)
   return getWhatsAppTextUrl(message)
 }
 
@@ -104,6 +106,8 @@ function App() {
   const [navigationSearch, setNavigationSearch] = useState('')
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isOrderFormOpen, setIsOrderFormOpen] = useState(false)
+  const [orderDetails, setOrderDetails] = useState<OrderDetails>(emptyOrderDetails)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -178,9 +182,17 @@ function App() {
     setIsCartOpen(true)
   }
 
+  const openOrderForm = () => {
+    if (!cart.length) return
+    setIsCartOpen(false)
+    setIsOrderFormOpen(true)
+  }
+
   const sendWhatsAppOrder = () => {
     if (!cart.length) return
-    window.open(getWhatsAppUrl(cart, subtotal), '_blank', 'noopener,noreferrer')
+    window.open(getWhatsAppUrl(cart, subtotal, orderDetails), '_blank', 'noopener,noreferrer')
+    setIsOrderFormOpen(false)
+    setOrderDetails(emptyOrderDetails)
   }
 
   const startGiftingConversation = () => {
@@ -314,7 +326,8 @@ function App() {
       </div>
 
       {selectedProduct && <ProductPicker product={selectedProduct} packIndex={selectedPackIndex} quantity={selectedQuantity} onPackChange={setSelectedPackIndex} onQuantityChange={setSelectedQuantity} onClose={() => setSelectedProduct(null)} onAdd={addSelectedItem} />}
-      <CartDrawer cart={cart} subtotal={subtotal} isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onChangeQuantity={changeQuantity} onRemoveItem={removeCartItem} onOrder={sendWhatsAppOrder} />
+      <CartDrawer cart={cart} subtotal={subtotal} isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} onChangeQuantity={changeQuantity} onRemoveItem={removeCartItem} onOrder={openOrderForm} />
+      <OrderDetailsDialog isOpen={isOrderFormOpen} details={orderDetails} subtotal={subtotal} onClose={() => setIsOrderFormOpen(false)} onBackToBasket={() => { setIsOrderFormOpen(false); setIsCartOpen(true) }} onChange={(field, value) => setOrderDetails((current) => ({ ...current, [field]: value }))} onSubmit={sendWhatsAppOrder} />
       {isLoading && <div className="site-loader fixed inset-0 z-[80] grid place-items-center overflow-hidden bg-[#082d25] text-[#fffaf0]" role="status" aria-label="Loading Atayinlife"><div className="loader-glow absolute size-[min(82vw,560px)] rounded-full bg-[#e9c66e]/15 blur-3xl" /><div className="relative flex flex-col items-center"><div className="loader-orbit grid size-24 place-items-center rounded-full border border-[#f0cf7e]/45"><div className="loader-core grid size-17 place-items-center rounded-full bg-[#f1cc75] text-[#103d31] shadow-[0_0_50px_rgba(241,204,117,.5)]"><Leaf size={34} strokeWidth={2.25} /></div></div><p className="mt-8 font-display text-[38px] tracking-[-0.05em]">Atayinlife</p><p className="mt-2 text-[11px] font-bold tracking-[0.2em] text-[#efd17e]">THE CONSIDERED MARKET</p><div className="mt-8 h-px w-40 overflow-hidden bg-white/15"><span className="loader-line block h-full bg-[#efcf7e]" /></div></div></div>}
     </main>
   )
@@ -327,6 +340,11 @@ function ProductPicker({ product, packIndex, quantity, onPackChange, onQuantityC
 
 function QuantityControl({ quantity, onChange }: { quantity: number; onChange: (quantity: number) => void }) {
   return <div className="flex items-center rounded-full border border-[#153d3320] bg-white p-1"><button onClick={() => onChange(Math.max(1, quantity - 1))} className="grid size-8 place-items-center rounded-full text-[#244b3f] hover:bg-[#e9f0e9]" aria-label="Decrease quantity"><Minus size={15} /></button><span className="w-8 text-center text-[14px] font-bold text-[#17382f]">{quantity}</span><button onClick={() => onChange(quantity + 1)} className="grid size-8 place-items-center rounded-full bg-[#e9f0e9] text-[#244b3f] hover:bg-[#dae8da]" aria-label="Increase quantity"><Plus size={15} /></button></div>
+}
+
+function OrderDetailsDialog({ isOpen, details, subtotal, onClose, onBackToBasket, onChange, onSubmit }: { isOpen: boolean; details: OrderDetails; subtotal: number; onClose: () => void; onBackToBasket: () => void; onChange: (field: keyof OrderDetails, value: string) => void; onSubmit: () => void }) {
+  if (!isOpen) return null
+  return <div className="fixed inset-0 z-[60] grid place-items-end bg-[#0b2c25]/45 p-0 backdrop-blur-sm sm:place-items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="order-details-title"><button type="button" onClick={onClose} className="absolute inset-0 cursor-default" aria-label="Close delivery details form" /><form onSubmit={(event) => { event.preventDefault(); onSubmit() }} className="relative w-full max-w-lg rounded-t-[1.8rem] bg-[#fbfaf5] p-6 shadow-2xl sm:rounded-[1.8rem] sm:p-8"><button type="button" onClick={onClose} className="absolute right-5 top-5 grid size-10 place-items-center rounded-full text-[#5d756b] transition hover:bg-[#e9f0e9] hover:text-[#17382f]" aria-label="Close delivery details form"><X size={21} /></button><p className="text-[12px] font-bold tracking-[0.12em] text-[#af6e20]">ALMOST THERE</p><h2 id="order-details-title" className="mt-2 pr-10 font-display text-[34px] leading-none tracking-[-0.04em] text-[#143b31]">Where should we send it?</h2><p className="mt-3 text-[15px] leading-6 text-[#60776d]">A few details help us confirm your order quickly on WhatsApp.</p><div className="mt-6 grid gap-4"><label className="grid gap-1.5 text-[14px] font-bold text-[#294f44]">Your name<input required autoComplete="name" value={details.name} onChange={(event) => onChange('name', event.target.value)} className="h-12 rounded-xl border border-[#173d3320] bg-white px-4 text-[16px] font-medium text-[#17382f] outline-none transition placeholder:text-[#879890] focus:border-[#1d6953] focus:ring-2 focus:ring-[#1d6953]/15" placeholder="Name for the order" /></label><label className="grid gap-1.5 text-[14px] font-bold text-[#294f44]">Delivery area<input required autoComplete="address-level2" value={details.deliveryArea} onChange={(event) => onChange('deliveryArea', event.target.value)} className="h-12 rounded-xl border border-[#173d3320] bg-white px-4 text-[16px] font-medium text-[#17382f] outline-none transition placeholder:text-[#879890] focus:border-[#1d6953] focus:ring-2 focus:ring-[#1d6953]/15" placeholder="Locality, city or pincode" /></label><label className="grid gap-1.5 text-[14px] font-bold text-[#294f44]">Preferred delivery time<input required value={details.deliveryTime} onChange={(event) => onChange('deliveryTime', event.target.value)} className="h-12 rounded-xl border border-[#173d3320] bg-white px-4 text-[16px] font-medium text-[#17382f] outline-none transition placeholder:text-[#879890] focus:border-[#1d6953] focus:ring-2 focus:ring-[#1d6953]/15" placeholder="For example, today after 6 PM" /></label><label className="grid gap-1.5 text-[14px] font-bold text-[#294f44]">Anything else? <span className="font-medium text-[#70857d]">Optional</span><textarea value={details.notes} onChange={(event) => onChange('notes', event.target.value)} rows={2} className="resize-none rounded-xl border border-[#173d3320] bg-white px-4 py-3 text-[16px] font-medium text-[#17382f] outline-none transition placeholder:text-[#879890] focus:border-[#1d6953] focus:ring-2 focus:ring-[#1d6953]/15" placeholder="Gift message, landmarks or special requests" /></label></div><div className="mt-6 flex items-center justify-between border-t border-[#173d3315] pt-5"><button type="button" onClick={onBackToBasket} className="text-[14px] font-bold text-[#356154] transition hover:text-[#a7661e]">← Edit basket</button><p className="text-[14px] font-bold text-[#294f44]">Total <span className="ml-1 font-display text-[25px] text-[#103d31]">{currency(subtotal)}</span></p></div><button type="submit" className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 text-[14px] font-bold text-[#063816] transition hover:-translate-y-0.5 hover:bg-[#38e878]"><FaWhatsapp size={20} /> Send order on WhatsApp</button></form></div>
 }
 
 function CartDrawer({ cart, subtotal, isOpen, onClose, onChangeQuantity, onRemoveItem, onOrder }: { cart: CartItem[]; subtotal: number; isOpen: boolean; onClose: () => void; onChangeQuantity: (id: number, pack: string, delta: number) => void; onRemoveItem: (id: number, pack: string) => void; onOrder: () => void }) {
