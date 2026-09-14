@@ -24,7 +24,7 @@ type Pack = { label: string; price: number }
 type Product = {
   id: number
   name: string
-  category: 'Fresh picks' | 'Exotic fruit' | 'Dry fruits' | 'Dates & nuts'
+  category: 'Premium dates' | 'Nuts & dry fruits'
   note: string
   image: string
   options: Pack[]
@@ -49,20 +49,22 @@ const imageUrls = {
   tropical: 'https://images.pexels.com/photos/4611444/pexels-photo-4611444.jpeg?auto=compress&cs=tinysrgb&w=1200',
   fresh: 'https://images.pexels.com/photos/8789764/pexels-photo-8789764.jpeg?auto=compress&cs=tinysrgb&w=1200',
   dry: 'https://images.pexels.com/photos/12351341/pexels-photo-12351341.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  datesDark: 'https://images.pexels.com/photos/3993529/pexels-photo-3993529.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  datesBowl: 'https://images.pexels.com/photos/4499229/pexels-photo-4499229.jpeg?auto=compress&cs=tinysrgb&w=1200',
 }
 
 const products: Product[] = [
-  { id: 1, name: 'Ruby Red Pomegranate', category: 'Fresh picks', note: 'Sweet, jewel-bright arils', image: imageUrls.fresh, options: [{ label: '1 kg', price: 299 }, { label: '2 kg', price: 549 }], badge: 'Just in' },
-  { id: 2, name: 'Thai Pink Guava', category: 'Fresh picks', note: 'Crisp, fragrant & handpicked', image: imageUrls.tropical, options: [{ label: '1 kg', price: 219 }, { label: '2 kg', price: 399 }] },
-  { id: 3, name: 'Dragon Fruit', category: 'Exotic fruit', note: 'Vibrant inside and out', image: imageUrls.tropical, options: [{ label: '500 g', price: 249 }, { label: '1 kg', price: 459 }], badge: 'Exotic' },
-  { id: 4, name: 'California Almonds', category: 'Dates & nuts', note: 'Large, crunchy & naturally rich', image: imageUrls.dry, options: [{ label: '250 g', price: 245 }, { label: '500 g', price: 465 }] },
-  { id: 5, name: 'Medjool Dates', category: 'Dates & nuts', note: 'Soft caramel notes, jumbo grade', image: imageUrls.dry, options: [{ label: '250 g', price: 329 }, { label: '500 g', price: 625 }], badge: 'Bestseller' },
-  { id: 6, name: 'Whole Cashews W320', category: 'Dry fruits', note: 'Buttery, whole and unbroken', image: imageUrls.dry, options: [{ label: '250 g', price: 229 }, { label: '500 g', price: 435 }] },
-  { id: 7, name: 'Turkish Apricots', category: 'Dry fruits', note: 'Sun-kissed, sweet and tender', image: imageUrls.dry, options: [{ label: '250 g', price: 285 }, { label: '500 g', price: 535 }] },
-  { id: 8, name: 'Golden Kiwi', category: 'Exotic fruit', note: 'Lush, tropical & vitamin-rich', image: imageUrls.fresh, options: [{ label: '3 pieces', price: 269 }, { label: '6 pieces', price: 499 }] },
+  { id: 1, name: 'Safawi Dates', category: 'Premium dates', note: 'Deep caramel character with a satisfyingly soft bite', image: imageUrls.datesDark, options: [{ label: '400 g', price: 699 }, { label: '800 g', price: 1299 }], badge: 'Signature' },
+  { id: 2, name: 'Ajwa Dates', category: 'Premium dates', note: 'A delicate, richly tender variety for everyday rituals', image: imageUrls.datesBowl, options: [{ label: '400 g', price: 999 }, { label: '800 g', price: 1899 }], badge: 'Reserve' },
+  { id: 3, name: 'Mabroom Dates', category: 'Premium dates', note: 'Long, firm fruit with a mellow, elegant finish', image: imageUrls.datesDark, options: [{ label: '400 g', price: 899 }, { label: '800 g', price: 1699 }] },
+  { id: 4, name: 'Sukkari Dates', category: 'Premium dates', note: 'Golden, buttery-soft and naturally honeyed', image: imageUrls.datesBowl, options: [{ label: '400 g', price: 599 }, { label: '800 g', price: 1099 }], badge: 'Popular' },
+  { id: 5, name: 'Sagayi Dates', category: 'Premium dates', note: 'A pleasing two-tone texture with gentle sweetness', image: imageUrls.datesDark, options: [{ label: '400 g', price: 699 }, { label: '800 g', price: 1299 }] },
+  { id: 6, name: 'Kimia Mazafati Dates', category: 'Premium dates', note: 'Plump, succulent and beautifully soft', image: imageUrls.datesBowl, options: [{ label: '400 g', price: 549 }, { label: '800 g', price: 999 }], badge: 'Soft & juicy' },
+  { id: 7, name: 'Walnut Halves', category: 'Nuts & dry fruits', note: 'Crunchy halves with a full, naturally rich flavour', image: imageUrls.dry, options: [{ label: '400 g', price: 549 }, { label: '800 g', price: 999 }] },
+  { id: 8, name: 'Macadamia Nuts', category: 'Nuts & dry fruits', note: 'Creamy, buttery and luxuriously crisp', image: imageUrls.dry, options: [{ label: '400 g', price: 1199 }, { label: '800 g', price: 2299 }], badge: 'Premium nut' },
 ]
 
-const categories = ['All', 'Fresh picks', 'Exotic fruit', 'Dry fruits', 'Dates & nuts'] as const
+const categories = ['All', 'Premium dates', 'Nuts & dry fruits'] as const
 const currency = (amount: number) => `₹${amount.toLocaleString('en-IN')}`
 const ownerWhatsapp = (import.meta.env.VITE_WHATSAPP_NUMBER || '918277274039').replace(/\D/g, '')
 const emptyOrderDetails: OrderDetails = { name: '', deliveryArea: '', deliveryTime: '', notes: '' }
