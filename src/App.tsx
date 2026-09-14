@@ -60,8 +60,8 @@ const products: Product[] = [
   { id: 4, name: 'Sukkari Dates', category: 'Premium dates', note: 'Golden, buttery-soft and naturally honeyed', image: imageUrls.datesBowl, options: [{ label: '400 g', price: 599 }, { label: '800 g', price: 1099 }], badge: 'Popular' },
   { id: 5, name: 'Sagayi Dates', category: 'Premium dates', note: 'A pleasing two-tone texture with gentle sweetness', image: imageUrls.datesDark, options: [{ label: '400 g', price: 699 }, { label: '800 g', price: 1299 }] },
   { id: 6, name: 'Kimia Mazafati Dates', category: 'Premium dates', note: 'Plump, succulent and beautifully soft', image: imageUrls.datesBowl, options: [{ label: '400 g', price: 549 }, { label: '800 g', price: 999 }], badge: 'Soft & juicy' },
-  { id: 7, name: 'Walnut Halves', category: 'Nuts & dry fruits', note: 'Crunchy halves with a full, naturally rich flavour', image: imageUrls.dry, options: [{ label: '400 g', price: 549 }, { label: '800 g', price: 999 }] },
-  { id: 8, name: 'Macadamia Nuts', category: 'Nuts & dry fruits', note: 'Creamy, buttery and luxuriously crisp', image: imageUrls.dry, options: [{ label: '400 g', price: 1199 }, { label: '800 g', price: 2299 }], badge: 'Premium nut' },
+  { id: 7, name: 'Walnuts', category: 'Nuts & dry fruits', note: 'Crunchy halves with a full, naturally rich flavour', image: imageUrls.dry, options: [{ label: '400 g', price: 549 }, { label: '800 g', price: 999 }] },
+  { id: 8, name: 'Macadamia', category: 'Nuts & dry fruits', note: 'Creamy, buttery and luxuriously crisp', image: imageUrls.dry, options: [{ label: '400 g', price: 1199 }, { label: '800 g', price: 2299 }], badge: 'Premium nut' },
 ]
 
 const categories = ['All', 'Premium dates', 'Nuts & dry fruits'] as const
@@ -203,7 +203,7 @@ function App() {
   }
 
   const startGeneralConversation = () => {
-    const message = 'Hello Atayinlife, I would like to know more about your fresh fruit, exotic fruit and dry-fruit collection.'
+    const message = 'Hello Atayinlife, I would like to know more about your premium dates, walnuts and macadamia collection.'
     window.open(getWhatsAppTextUrl(message), '_blank', 'noopener,noreferrer')
   }
 
@@ -274,7 +274,7 @@ function App() {
       {isMenuOpen && <button type="button" onClick={() => setIsMenuOpen(false)} className="fixed inset-0 z-20 cursor-default bg-[#082d25]/25 backdrop-blur-[1px] lg:hidden" aria-label="Close navigation menu" />}
 
       <section id="top" className="hero-shell relative isolate min-h-[720px] overflow-hidden bg-[#082c25] lg:min-h-[760px]">
-        <img src={imageUrls.tropical} alt="Fresh tropical fruits arranged in a colourful still life" className="hero-media absolute inset-0 -z-30 h-full w-full object-cover object-[63%_48%]" />
+        <img src={imageUrls.datesDark} alt="Premium dates arranged in a rich still life" className="hero-media absolute inset-0 -z-30 h-full w-full object-cover object-[63%_48%]" />
         <div className="absolute inset-0 -z-20 bg-[linear-gradient(96deg,rgba(4,34,28,.98)_0%,rgba(7,45,36,.89)_40%,rgba(8,39,32,.42)_71%,rgba(8,39,32,.55)_100%)]" />
         <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_72%_22%,rgba(241,201,109,.32),transparent_24%),radial-gradient(circle_at_78%_84%,rgba(43,135,98,.28),transparent_29%)]" />
         <div className="hero-orb absolute -right-24 top-28 -z-10 size-72 rounded-full bg-[#f2cd79]/20 blur-3xl" aria-hidden="true" />
@@ -283,21 +283,21 @@ function App() {
 
         <div className="mx-auto grid min-h-[720px] max-w-7xl items-end gap-10 px-5 pb-24 pt-20 sm:pb-28 lg:min-h-[760px] lg:grid-cols-[1.15fr_.85fr] lg:px-8 lg:pb-32">
           <div className="hero-copy max-w-3xl text-[#fffdf4]">
-            <div className="mb-7 flex flex-wrap items-center gap-3"><span className="inline-flex items-center gap-2 rounded-full border border-[#f4d998]/35 bg-[#153d34]/65 px-3.5 py-2 text-[12px] font-bold tracking-[0.1em] text-[#f8d988] backdrop-blur-sm"><Sparkles size={14} /> THE SEASONAL EDIT</span><span className="text-[12px] font-semibold tracking-[0.12em] text-white/60">01 / 04</span></div>
-            <p className="mb-4 text-[12px] font-bold tracking-[0.16em] text-[#d8ecdb]/80">FRUIT, BUT MORE CONSIDERED</p>
+            <div className="mb-7 flex flex-wrap items-center gap-3"><span className="inline-flex items-center gap-2 rounded-full border border-[#f4d998]/35 bg-[#153d34]/65 px-3.5 py-2 text-[12px] font-bold tracking-[0.1em] text-[#f8d988] backdrop-blur-sm"><Sparkles size={14} /> THE DATE & NUT EDIT</span><span className="text-[12px] font-semibold tracking-[0.12em] text-white/60">08 SELECTIONS</span></div>
+            <p className="mb-4 text-[12px] font-bold tracking-[0.16em] text-[#d8ecdb]/80">DATES & DRY FRUITS, CONSIDERED</p>
             <h1 className="font-display text-[56px] leading-[0.9] tracking-[-0.06em] sm:text-[76px] lg:text-[96px]">More than<br />a <em className="font-normal text-[#f5cd75]">market.</em></h1>
-            <p className="mt-7 max-w-xl text-[17px] leading-7 text-[#f7f1dc]/86 sm:text-[19px]">An evolving edit of fresh fruit, rare exotic produce, premium dates and dry fruits—picked for people who notice the difference.</p>
+            <p className="mt-7 max-w-xl text-[17px] leading-7 text-[#f7f1dc]/86 sm:text-[19px]">A focused collection of six premium date varieties, walnuts and macadamia—chosen for people who notice the difference.</p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row"><a href="#shop" className="group inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-[#f4c96f] px-7 text-[14px] font-bold text-[#15382f] shadow-[0_14px_36px_rgba(5,30,25,.28)] transition duration-300 hover:-translate-y-1 hover:bg-[#ffe09a]">Explore the market <ArrowRight className="transition-transform duration-300 group-hover:translate-x-1" size={17} /></a><a href="#how-it-works" className="inline-flex min-h-13 items-center justify-center gap-2 rounded-full border border-white/35 px-7 text-[14px] font-bold text-white transition hover:bg-white/10">The Atayinlife way <ChevronRight size={17} /></a></div>
-            <div className="mt-12 flex items-center gap-4 text-[13px] font-medium text-[#d9e9dc]/75"><span className="h-px w-10 bg-[#f4cd75]" /><span>Fresh arrivals, in their best moment</span></div>
+            <div className="mt-12 flex items-center gap-4 text-[13px] font-medium text-[#d9e9dc]/75"><span className="h-px w-10 bg-[#f4cd75]" /><span>Premium dates and nuts, packed with care</span></div>
           </div>
 
           <div className="hero-side hidden self-center justify-self-end lg:block">
             <div className="hero-sun inline-flex size-20 items-center justify-center rounded-full border border-[#f2cd79]/45 bg-[#103d31]/60 text-center text-[11px] font-bold leading-4 tracking-[0.08em] text-[#f7d77f] backdrop-blur-md">NEW<br />HARVEST</div>
-            <article className="hero-float-card mt-16 w-[290px] rounded-[1.7rem] border border-white/20 bg-[#fbfaf5]/95 p-4 text-[#143b31] shadow-[0_28px_80px_rgba(0,0,0,.28)] backdrop-blur-lg"><div className="overflow-hidden rounded-[1.15rem] bg-[#dce8d5]"><img src={imageUrls.fresh} alt="Seasonal fresh fruit selection" className="h-36 w-full object-cover" /></div><div className="px-1 pb-1 pt-4"><div className="flex items-start justify-between gap-4"><div><p className="text-[11px] font-bold tracking-[0.12em] text-[#ab6c20]">THIS WEEK&apos;S FIND</p><h2 className="mt-1 font-display text-[24px] tracking-[-0.045em]">Colour outside the ordinary.</h2></div><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#e9f0e6] text-[#205943]"><ArrowRight size={16} /></span></div><div className="mt-4 flex items-center justify-between border-t border-[#153d3314] pt-3 text-[12px] font-bold text-[#527066]"><span>PEAK SEASON</span><span>→ EXPLORE</span></div></div></article>
+            <article className="hero-float-card mt-16 w-[290px] rounded-[1.7rem] border border-white/20 bg-[#fbfaf5]/95 p-4 text-[#143b31] shadow-[0_28px_80px_rgba(0,0,0,.28)] backdrop-blur-lg"><div className="overflow-hidden rounded-[1.15rem] bg-[#dce8d5]"><img src={imageUrls.datesBowl} alt="Premium dates in a bowl" className="h-36 w-full object-cover" /></div><div className="px-1 pb-1 pt-4"><div className="flex items-start justify-between gap-4"><div><p className="text-[11px] font-bold tracking-[0.12em] text-[#ab6c20]">THIS WEEK&apos;S EDIT</p><h2 className="mt-1 font-display text-[24px] tracking-[-0.045em]">The ritual, refined.</h2></div><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#e9f0e6] text-[#205943]"><ArrowRight size={16} /></span></div><div className="mt-4 flex items-center justify-between border-t border-[#153d3314] pt-3 text-[12px] font-bold text-[#527066]"><span>DATES & NUTS</span><span>→ EXPLORE</span></div></div></article>
           </div>
         </div>
 
-        <div className="hero-marquee absolute inset-x-0 bottom-0 border-y border-white/15 bg-[#0b342b]/65 py-3 backdrop-blur-md"><div className="hero-marquee-track flex w-max items-center gap-8 whitespace-nowrap text-[12px] font-bold tracking-[0.16em] text-[#e6eee1]/90"><span>FRESH, NOT FORGETTABLE</span><span className="text-[#f3cf7a]">✦</span><span>EXOTIC FINDS</span><span className="text-[#f3cf7a]">✦</span><span>PREMIUM DRY FRUITS</span><span className="text-[#f3cf7a]">✦</span><span>THOUGHTFULLY PACKED</span><span className="text-[#f3cf7a]">✦</span><span>FRESH, NOT FORGETTABLE</span><span className="text-[#f3cf7a]">✦</span><span>EXOTIC FINDS</span><span className="text-[#f3cf7a]">✦</span></div></div>
+        <div className="hero-marquee absolute inset-x-0 bottom-0 border-y border-white/15 bg-[#0b342b]/65 py-3 backdrop-blur-md"><div className="hero-marquee-track flex w-max items-center gap-8 whitespace-nowrap text-[12px] font-bold tracking-[0.16em] text-[#e6eee1]/90"><span>PREMIUM DATES</span><span className="text-[#f3cf7a]">✦</span><span>WALNUTS</span><span className="text-[#f3cf7a]">✦</span><span>MACADAMIA</span><span className="text-[#f3cf7a]">✦</span><span>THOUGHTFULLY PACKED</span><span className="text-[#f3cf7a]">✦</span><span>PREMIUM DATES</span><span className="text-[#f3cf7a]">✦</span><span>WALNUTS</span><span className="text-[#f3cf7a]">✦</span></div></div>
       </section>
 
       <section className="border-b border-[#17463815] bg-[#f6f2e7]"><div className="mx-auto grid max-w-7xl grid-cols-1 divide-y divide-[#17463818] px-5 sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:px-8">{[['Picked for peak flavour', 'Fresh arrivals that are worth the wait'], ['Packed with a little ceremony', 'Protective, considered and gift-ready'], ['A simple way to order', 'Build your basket, confirm on WhatsApp']].map(([title, caption]) => <div key={title} className="flex items-center gap-3 py-5 sm:px-5 sm:first:pl-0"><Check className="shrink-0 text-[#b97825]" size={18} strokeWidth={2.5} /><div><p className="text-[14px] font-bold text-[#17382f]">{title}</p><p className="mt-0.5 text-[13px] text-[#5e746c]">{caption}</p></div></div>)}</div></section>
