@@ -27,6 +27,7 @@ type Product = {
   category: 'Premium dates' | 'Everyday dates' | 'Nuts'
   note: string
   image: string
+  images?: string[]
   options: Pack[]
   badge?: string
   origin: string
@@ -59,7 +60,7 @@ const imageUrls = {
 
 const products: Product[] = [
   { id: 1, name: 'Safawi Dates', category: 'Premium dates', note: 'Deep caramel character with a satisfyingly soft bite', image: imageUrls.datesDark, options: [{ label: '400 g', price: 449 }, { label: '800 g', price: 749 }], badge: 'Signature', origin: 'Saudi Arabia', grade: 'Premium hand-selected', taste: 'Deep, smooth and gently caramelled', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
-  { id: 2, name: 'Ajwa Dates', category: 'Premium dates', note: 'A delicate, richly tender variety for everyday rituals', image: imageUrls.datesBowl, options: [{ label: '400 g', price: 649 }, { label: '800 g', price: 949 }], badge: 'Reserve', origin: 'Madinah, Saudi Arabia', grade: 'Premium hand-selected', taste: 'Soft, delicate and complex', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
+  { id: 2, name: 'Ajwa Dates', category: 'Premium dates', note: 'A delicate, richly tender variety for everyday rituals', image: '/products/ajwa/ajwa-1.png', images: ['/products/ajwa/ajwa-1.png', '/products/ajwa/ajwa-2.png', '/products/ajwa/ajwa-3.png', '/products/ajwa/ajwa-4.png'], options: [{ label: '400 g', price: 649 }, { label: '800 g', price: 949 }], badge: 'Reserve', origin: 'Madinah, Saudi Arabia', grade: 'Premium hand-selected', taste: 'Soft, delicate and complex', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
   { id: 3, name: 'Mabroom Dates', category: 'Premium dates', note: 'Long, firm fruit with a mellow, elegant finish', image: imageUrls.datesDark, options: [{ label: '400 g', price: 749 }, { label: '800 g', price: 949 }], origin: 'Saudi Arabia', grade: 'Premium hand-selected', taste: 'Firm, mellow and naturally sweet', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
   { id: 4, name: 'Sukkari Dates', category: 'Everyday dates', note: 'Golden, buttery-soft and naturally honeyed', image: imageUrls.datesBowl, options: [{ label: '400 g', price: 379 }, { label: '800 g', price: 599 }], badge: 'Popular', origin: 'Saudi Arabia', grade: 'Carefully selected', taste: 'Golden, buttery and honey-like', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
   { id: 5, name: 'Sagayi Dates', category: 'Everyday dates', note: 'A pleasing two-tone texture with gentle sweetness', image: imageUrls.datesDark, options: [{ label: '400 g', price: 399 }, { label: '800 g', price: 599 }], origin: 'Saudi Arabia', grade: 'Carefully selected', taste: 'Balanced sweetness with a pleasing chew', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
@@ -351,10 +352,14 @@ function App() {
 
 function ProductPicker({ product, packIndex, quantity, onPackChange, onQuantityChange, onClose, onAdd, onBuyNow }: { product: Product; packIndex: number; quantity: number; onPackChange: (index: number) => void; onQuantityChange: (quantity: number) => void; onClose: () => void; onAdd: () => void; onBuyNow: () => void }) {
   const pack = product.options[packIndex]
+  const gallery = product.images?.length ? product.images : [product.image]
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const activeImage = gallery[Math.min(activeImageIndex, gallery.length - 1)]
+
   return <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#0b2c25]/45 p-2 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="picker-title">
     <button type="button" onClick={onClose} className="absolute inset-0 z-0 cursor-default" aria-label="Close product options" />
     <div className="relative z-10 grid max-h-[calc(100dvh-1rem)] w-full max-w-4xl grid-rows-[minmax(10.5rem,0.42fr)_minmax(0,1fr)] overflow-hidden rounded-[1.6rem] bg-[#fbfaf5] shadow-2xl sm:max-h-[min(760px,calc(100dvh-2.5rem))] sm:rounded-[1.8rem] lg:grid-cols-[0.82fr_1.18fr] lg:grid-rows-1">
-      <div className="relative min-h-0"><img src={product.image} alt={product.name} className="h-full w-full object-cover" /><button type="button" onClick={onClose} className="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-white/90 text-[#17382f] shadow-sm transition hover:bg-white" aria-label="Close product options"><X size={19} /></button></div>
+      <div className="relative min-h-0"><img src={activeImage} alt={`${product.name} product view ${activeImageIndex + 1}`} className="h-full w-full object-cover" /><button type="button" onClick={onClose} className="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-white/90 text-[#17382f] shadow-sm transition hover:bg-white" aria-label="Close product options"><X size={19} /></button>{gallery.length > 1 && <div className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">{gallery.map((image, index) => <button type="button" key={image} onClick={() => setActiveImageIndex(index)} className={`h-12 w-[58px] shrink-0 overflow-hidden rounded-lg border-2 bg-white shadow-sm transition ${activeImageIndex === index ? 'border-[#f4cc73] ring-2 ring-[#163f35]/30' : 'border-white/85 opacity-80 hover:opacity-100'}`} aria-label={`View ${product.name} image ${index + 1}`} aria-pressed={activeImageIndex === index}><img src={image} alt="" className="h-full w-full object-cover" /></button>)}</div>}</div>
       <div className="flex min-h-0 flex-col">
         <div className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain px-5 py-5 sm:px-8 sm:py-7">
           <p className="text-[12px] font-bold tracking-[0.12em] text-[#b57423]">{product.category.toUpperCase()}</p>
