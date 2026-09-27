@@ -84,6 +84,39 @@ const products: Product[] = [
   { id: 24, name: 'Raisins Green', category: 'Dry fruits', note: 'Slender green raisins with a bright, tangy sweetness', image: imageUrls.dry, options: [], origin: 'Selected growing regions', grade: 'Premium selected fruit', taste: 'Bright, tangy and gently sweet', storage: 'Store sealed in a cool, dry place away from direct sunlight.' },
 ]
 
+const productGalleries: Record<number, string[]> = {
+  1: ['/products/premium-dates/safawi-dates/01.webp', '/products/premium-dates/safawi-dates/02.webp', '/products/premium-dates/safawi-dates/03.webp'],
+  2: ['/products/premium-dates/ajwa-dates/01.webp', '/products/premium-dates/ajwa-dates/02.webp', '/products/premium-dates/ajwa-dates/03.webp'],
+  3: ['/products/premium-dates/mabroom-dates/01.webp', '/products/premium-dates/mabroom-dates/02.webp', '/products/premium-dates/mabroom-dates/03.webp'],
+  4: ['/products/premium-dates/sukkari-dates/01.webp', '/products/premium-dates/sukkari-dates/02.webp', '/products/premium-dates/sukkari-dates/03.webp'],
+  5: ['/products/premium-dates/sagayi-dates/01.webp', '/products/premium-dates/sagayi-dates/02.webp', '/products/premium-dates/sagayi-dates/03.webp'],
+  6: ['/products/premium-dates/majdool-dates/01.webp', '/products/premium-dates/majdool-dates/02.webp', '/products/premium-dates/majdool-dates/03.webp'],
+  7: ['/products/everyday/deglet-noor/01.webp', '/products/everyday/deglet-noor/02.webp'],
+  8: ['/products/everyday/fard/01.webp', '/products/everyday/fard/02.webp'],
+  9: ['/products/everyday/mazafati-kimia/01.webp', '/products/everyday/mazafati-kimia/02.webp'],
+  10: ['/products/everyday/zahdi/01.webp', '/products/everyday/zahdi/02.webp'],
+  11: ['/products/nuts/almond/01.webp', '/products/nuts/almond/02.webp'],
+  12: ['/products/nuts/burma-cashews/01.webp', '/products/nuts/burma-cashews/02.webp'],
+  13: ['/products/nuts/macadamia/01.webp', '/products/nuts/macadamia/02.webp'],
+  14: ['/products/nuts/pistachio-plain/01.webp', '/products/nuts/pistachio-plain/02.webp'],
+  15: ['/products/nuts/pistachio-salted/01.webp', '/products/nuts/pistachio-salted/02.webp'],
+  16: ['/products/nuts/w240-cashews/01.webp', '/products/nuts/w240-cashews/02.webp'],
+  17: ['/products/nuts/w320-cashews/01.webp', '/products/nuts/w320-cashews/02.webp'],
+  18: ['/products/nuts/walnut/01.webp', '/products/nuts/walnut/02.webp'],
+  19: ['/products/dry-fruits/dried-apricot/01.webp', '/products/dry-fruits/dried-apricot/02.webp'],
+  20: ['/products/dry-fruits/dry-fruits-mix/01.webp', '/products/dry-fruits/dry-fruits-mix/02.webp'],
+  21: ['/products/dry-fruits/fig/01.webp', '/products/dry-fruits/fig/02.webp'],
+  22: ['/products/dry-fruits/raisins-black-seed/01.webp', '/products/dry-fruits/raisins-black-seed/02.webp'],
+  23: ['/products/dry-fruits/raisins-black-seedless/01.webp', '/products/dry-fruits/raisins-black-seedless/02.webp'],
+  24: ['/products/dry-fruits/raisins-green/01.webp', '/products/dry-fruits/raisins-green/02.webp'],
+}
+
+const getProductImages = (product: Product) => productGalleries[product.id] || [product.image]
+
+products.forEach((product) => {
+  product.image = getProductImages(product)[0]
+})
+
 const categories = ['All', 'Premium dates', 'Everyday dates', 'Dry fruits', 'Nuts'] as const
 const currency = (amount: number) => `₹${amount.toLocaleString('en-IN')}`
 const ownerWhatsapp = (import.meta.env.VITE_WHATSAPP_NUMBER || '918277274039').replace(/\D/g, '')
@@ -182,7 +215,7 @@ function App() {
     setCart((currentCart) => {
       const existing = currentCart.find((item) => item.id === product.id && item.pack.label === pack.label)
       if (existing) return currentCart.map((item) => item.id === product.id && item.pack.label === pack.label ? { ...item, quantity: item.quantity + quantity } : item)
-      return [...currentCart, { ...product, pack, quantity }]
+      return [...currentCart, { ...product, image: getProductImages(product)[0], pack, quantity }]
     })
   }
 
@@ -381,7 +414,17 @@ function App() {
   )
 }
 
-function ProductPicker({ product, packIndex, quantity, onPackChange, onQuantityChange, onClose, onAdd, onBuyNow }: { product: Product; packIndex: number; quantity: number; onPackChange: (index: number) => void; onQuantityChange: (quantity: number) => void; onClose: () => void; onAdd: () => void; onBuyNow: () => void }) {
+function ProductPicker({ product: sourceProduct, packIndex, quantity, onPackChange, onQuantityChange, onClose, onAdd, onBuyNow }: { product: Product; packIndex: number; quantity: number; onPackChange: (index: number) => void; onQuantityChange: (quantity: number) => void; onClose: () => void; onAdd: () => void; onBuyNow: () => void }) {
+  const images = getProductImages(sourceProduct)
+  const [imageIndex, setImageIndex] = useState(0)
+  const product = { ...sourceProduct, image: images[imageIndex] }
+
+  useEffect(() => {
+    if (images.length < 2) return
+    const timer = window.setInterval(() => setImageIndex((current) => (current + 1) % images.length), 3500)
+    return () => window.clearInterval(timer)
+  }, [images.length])
+
   const pack = product.options[packIndex]
   return <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#0b2c25]/45 p-2 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="picker-title"><button onClick={onClose} className="absolute inset-0 cursor-default" aria-label="Close product options" /><div className="relative flex max-h-[calc(100dvh-1rem)] w-full max-w-3xl flex-col overflow-hidden rounded-[1.8rem] bg-[#fbfaf5] shadow-2xl sm:max-h-[min(760px,calc(100dvh-2.5rem))] sm:grid sm:grid-cols-2"><div className="relative h-48 shrink-0 sm:h-auto"><img src={product.image} alt={product.name} className="h-full w-full object-cover" /><button onClick={onClose} className="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-white/90 text-[#17382f]" aria-label="Close product options"><X size={19} /></button></div><div className="flex min-h-0 flex-col"><div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8 sm:py-8"><p className="text-[12px] font-bold tracking-[0.12em] text-[#b57423]">{product.category.toUpperCase()}</p><h2 id="picker-title" className="mt-2 pr-8 font-display text-[35px] leading-none tracking-[-0.04em] text-[#153d32]">{product.name}</h2><p className="mt-3 text-[15px] text-[#668077]">{product.note}</p><div className="mt-5 grid gap-3 rounded-2xl bg-[#edf3e9] p-4 text-[13px] leading-5 text-[#46645a]"><p><span className="font-bold text-[#1c493c]">Origin:</span> {product.origin}</p><p><span className="font-bold text-[#1c493c]">Quality:</span> {product.grade}</p><p><span className="font-bold text-[#1c493c]">Taste:</span> {product.taste}</p><p><span className="font-bold text-[#1c493c]">Storage:</span> {product.storage}</p><p><span className="font-bold text-[#1c493c]">Ingredients:</span> 100% {product.name.toLowerCase()}. No added preservatives.</p><p><span className="font-bold text-[#1c493c]">Nutrition & FSSAI:</span> Please refer to the final pack label for batch-specific information.</p></div><p className="mt-6 text-[13px] font-bold text-[#34594d]">CHOOSE A SIZE</p><div className="mt-3 grid grid-cols-2 gap-2">{product.options.map((option, index) => <button key={option.label} onClick={() => onPackChange(index)} className={`rounded-xl border px-3 py-3 text-left transition ${packIndex === index ? 'border-[#103d31] bg-[#eaf0e7] text-[#103d31]' : 'border-[#153d3320] bg-white text-[#4c665e]'}`}><span className="block text-[14px] font-bold">{option.label}</span><span className="mt-0.5 block text-[13px]">{currency(option.price)} incl. GST</span></button>)}</div><div className="mt-6 flex items-center justify-between"><p className="text-[13px] font-bold text-[#34594d]">QUANTITY</p><QuantityControl quantity={quantity} onChange={onQuantityChange} /></div></div><div className="shrink-0 border-t border-[#173d3318] bg-[#f4f0e4] px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-8"><div className="flex items-center justify-between"><div><p className="text-[13px] text-[#668077]">Your selection</p><p className="text-[16px] font-bold text-[#17382f]">{pack.label} × {quantity}</p></div><p className="font-display text-[31px] text-[#153d32]">{currency(pack.price * quantity)}</p></div><div className="mt-4 grid gap-2 sm:grid-cols-2"><button onClick={onAdd} className="flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#103d31] bg-white text-[14px] font-bold text-[#103d31] transition hover:bg-[#e9f0e9]"><ShoppingBag size={17} /> Add to basket</button><button onClick={onBuyNow} className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#103d31] text-[14px] font-bold text-white transition hover:bg-[#1e5948]"><FaWhatsapp size={19} /> Buy now</button></div></div></div></div></div>
 }
