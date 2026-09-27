@@ -57,7 +57,7 @@ const imageUrls = {
   datesBowl: 'https://images.pexels.com/photos/4499229/pexels-photo-4499229.jpeg?auto=compress&cs=tinysrgb&w=1200',
 }
 
-const products: Product[] = [
+const baseProducts: Product[] = [
   { id: 1, name: 'Safawi Dates', category: 'Premium dates', note: 'Deep caramel character with a satisfyingly soft bite', image: imageUrls.datesDark, options: [{ label: '400 g', price: 449 }, { label: '800 g', price: 749 }], badge: 'Signature', origin: 'Saudi Arabia', grade: 'Premium hand-selected', taste: 'Deep, smooth and gently caramelled', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
   { id: 2, name: 'Ajwa Dates', category: 'Premium dates', note: 'A delicate, richly tender variety for everyday rituals', image: imageUrls.datesBowl, options: [{ label: '400 g', price: 649 }, { label: '800 g', price: 949 }], badge: 'Reserve', origin: 'Madinah, Saudi Arabia', grade: 'Premium hand-selected', taste: 'Soft, delicate and complex', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
   { id: 3, name: 'Mabroom Dates', category: 'Premium dates', note: 'Long, firm fruit with a mellow, elegant finish', image: imageUrls.datesDark, options: [{ label: '400 g', price: 749 }, { label: '800 g', price: 949 }], origin: 'Saudi Arabia', grade: 'Premium hand-selected', taste: 'Firm, mellow and naturally sweet', storage: 'Store sealed in a cool, dry place. Refrigerate in warm weather.' },
@@ -113,8 +113,22 @@ const productGalleries: Record<number, string[]> = {
 
 const getProductImages = (product: Product) => productGalleries[product.id] || [product.image]
 
-products.forEach((product) => {
-  product.image = getProductImages(product)[0]
+const placeholderPackPrices: Partial<Record<Product['category'], [number, number]>> = {
+  'Everyday dates': [349, 649],
+  Nuts: [699, 1299],
+  'Dry fruits': [449, 849],
+}
+
+const products: Product[] = baseProducts.map((product) => {
+  const [smallPackPrice, largePackPrice] = placeholderPackPrices[product.category] || [399, 749]
+  return {
+    ...product,
+    image: getProductImages(product)[0],
+    options: product.options.length ? product.options : [
+      { label: '400 g', price: smallPackPrice },
+      { label: '800 g', price: largePackPrice },
+    ],
+  }
 })
 
 const categories = ['All', 'Premium dates', 'Everyday dates', 'Dry fruits', 'Nuts'] as const
@@ -231,30 +245,23 @@ function App() {
     setCart((currentCart) => currentCart.filter((item) => item.id !== id || item.pack.label !== packLabel))
   }
 
-  const startProductEnquiry = (product: Product) => {
-    const message = `Hello Atayinlife, I would like to know the available pack sizes and prices for ${product.name}.`
-    window.open(getWhatsAppTextUrl(message), '_blank', 'noopener,noreferrer')
-  }
-
   const openPicker = (product: Product) => {
-    if (!product.options.length) {
-      startProductEnquiry(product)
-      return
-    }
     setSelectedProduct(product)
     setSelectedPackIndex(0)
     setSelectedQuantity(1)
   }
 
+  const startProductEnquiry = openPicker
+
   const addSelectedItem = () => {
-    if (!selectedProduct || !selectedProduct.options[selectedPackIndex]) return
+    if (!selectedProduct) return
     addToCart(selectedProduct, selectedProduct.options[selectedPackIndex], selectedQuantity)
     setSelectedProduct(null)
     setIsCartOpen(true)
   }
 
   const buySelectedItem = () => {
-    if (!selectedProduct || !selectedProduct.options[selectedPackIndex]) return
+    if (!selectedProduct) return
     addToCart(selectedProduct, selectedProduct.options[selectedPackIndex], selectedQuantity)
     setSelectedProduct(null)
     setIsOrderFormOpen(true)
@@ -466,7 +473,7 @@ function OrderDetailsDialog({ isOpen, details, subtotal, freeShippingRemaining, 
 
 function CartDrawer({ cart, subtotal, freeShippingRemaining, isOpen, onClose, onChangeQuantity, onRemoveItem, onAddRecommended, onOrder }: { cart: CartItem[]; subtotal: number; freeShippingRemaining: number; isOpen: boolean; onClose: () => void; onChangeQuantity: (id: number, pack: string, delta: number) => void; onRemoveItem: (id: number, pack: string) => void; onAddRecommended: (product: Product) => void; onOrder: () => void }) {
   if (!isOpen) return null
-  const recommendations = products.filter((product) => product.options.length > 0 && !cart.some((item) => item.id === product.id)).slice(0, 3)
+  const recommendations = products.filter((product) => !cart.some((item) => item.id === product.id)).slice(0, 3)
   const shippingUnlocked = freeShippingRemaining === 0
 
   return <div className="fixed inset-0 z-50 bg-[#0b2c25]/35 backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-labelledby="basket-title"><button onClick={onClose} className="absolute inset-0 cursor-default" aria-label="Close basket" /><aside className="absolute right-0 top-0 flex h-full w-full max-w-[430px] flex-col bg-[#fbfaf5] shadow-2xl"><div className="flex items-center justify-between border-b border-[#173d3315] px-6 py-5"><div><p className="text-[12px] font-bold tracking-[0.12em] text-[#af6e20]">YOUR SELECTION</p><h2 id="basket-title" className="mt-1 font-display text-[31px] tracking-[-0.04em] text-[#143b31]">Your basket</h2></div><button onClick={onClose} className="grid size-10 place-items-center rounded-full hover:bg-[#e9f0e9]" aria-label="Close basket"><X size={21} /></button></div>{cart.length ? <><div className="flex-1 overflow-y-auto px-6 py-5">{cart.map((item) => <div key={`${item.id}-${item.pack.label}`} className="flex gap-4 border-b border-[#173d3312] py-4 first:pt-0"><img src={item.image} alt="" className="size-[76px] rounded-xl object-cover" /><div className="min-w-0 flex-1"><div className="flex gap-2"><div className="min-w-0 flex-1"><p className="truncate text-[15px] font-bold text-[#17382f]">{item.name}</p><p className="mt-0.5 text-[13px] text-[#6d837b]">{item.pack.label}</p></div><p className="text-[14px] font-bold text-[#a5661f]">{currency(item.pack.price * item.quantity)}</p></div><div className="mt-3 flex items-center justify-between gap-4"><QuantityControl quantity={item.quantity} onChange={(newQuantity) => onChangeQuantity(item.id, item.pack.label, newQuantity - item.quantity)} /><button onClick={() => onRemoveItem(item.id, item.pack.label)} className="inline-flex min-h-9 items-center gap-1.5 rounded-full px-2 text-[13px] font-bold text-[#a35a35] transition hover:bg-[#f8e8de]" aria-label={`Remove ${item.name} from basket`}><Trash2 size={15} /> Remove</button></div></div></div>)}{recommendations.length > 0 && <section className="mt-6 border-t border-[#173d3315] pt-5"><p className="text-[12px] font-bold tracking-[0.12em] text-[#af6e20]">YOU MAY ALSO LIKE</p><div className="mt-3 grid gap-2">{recommendations.map((product) => <button key={product.id} onClick={() => onAddRecommended(product)} className="flex items-center gap-3 rounded-2xl border border-[#173d3315] bg-white p-2 text-left transition hover:border-[#1d6953]"><img src={product.image} alt="" className="size-12 rounded-xl object-cover" /><span className="min-w-0 flex-1"><span className="block truncate text-[14px] font-bold text-[#17382f]">{product.name}</span><span className="block text-[12px] text-[#6d837b]">{product.options[0].label} · {currency(product.options[0].price)}</span></span><span className="grid size-8 place-items-center rounded-full bg-[#e9f0e9] text-[#1d6953]"><Plus size={16} /></span></button>)}</div></section>}</div><div className="border-t border-[#173d3315] bg-[#f4f0e4] p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"><div className={`rounded-xl px-4 py-3 text-[13px] font-bold ${shippingUnlocked ? 'bg-[#dcefdc] text-[#1d6548]' : 'bg-[#fff1c9] text-[#8d5d18]'}`}>{shippingUnlocked ? '🎉 You’ve unlocked FREE SHIPPING!' : `Add ${currency(freeShippingRemaining)} more to get FREE SHIPPING 🚚`}</div><div className="mt-4 grid gap-2 text-[13px] text-[#617970]"><p className="flex justify-between"><span>Subtotal</span><span>{currency(subtotal)}</span></p><p className="flex justify-between"><span>GST</span><span>Included (5%)</span></p><p className="flex justify-between"><span>Shipping</span><span className="font-bold text-[#294f44]">{shippingUnlocked ? 'FREE' : 'Confirmed on WhatsApp'}</span></p></div><div className="mt-3 flex items-center justify-between border-t border-[#173d3315] pt-3"><p className="text-[15px] font-bold text-[#294f44]">Current total</p><p className="font-display text-[32px] tracking-[-0.04em] text-[#103d31]">{currency(subtotal)}</p></div><p className="mt-1 text-[12px] leading-5 text-[#698077]">Customer-facing prices include GST. Delivery is free from {currency(FREE_SHIPPING_THRESHOLD)}.</p><button onClick={onOrder} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 text-[14px] font-bold text-[#063816] transition hover:bg-[#38e878]"><FaWhatsapp size={20} /> Confirm on WhatsApp</button></div></> : <div className="grid flex-1 place-items-center px-8 text-center"><div><span className="mx-auto grid size-14 place-items-center rounded-full bg-[#e8eee7] text-[#285347]"><ShoppingBag size={25} /></span><h3 className="mt-5 font-display text-[30px] tracking-[-0.035em] text-[#163e33]">Your basket is waiting.</h3><p className="mx-auto mt-2 max-w-xs text-[15px] leading-6 text-[#657c73]">Choose a premium date variety, walnuts or macadamia to get started.</p><button onClick={onClose} className="mt-6 rounded-full bg-[#103d31] px-5 py-3 text-[14px] font-bold text-white">Continue shopping</button></div></div>}</aside></div>
